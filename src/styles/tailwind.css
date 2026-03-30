@@ -1,0 +1,44 @@
+/* src/styles/tailwind.css */
+@import "tailwindcss";
+
+@theme {
+  --color-brand:       #8CC7C4;
+  --color-brand-light: #b3dbd9;
+  --color-brand-dark:  #5fa8a5;
+  --color-brand-muted: rgba(140, 199, 196, 0.15);
+
+  /* App dark surface colors */
+  --color-surface:      #0f1117;
+  --color-surface-1:    #141824;
+  --color-surface-2:    #1c2130;
+  --color-surface-3:    #242a38;
+  --color-border:       #252d3d;
+  --color-border-light: #2e3850;
+}
+
+/* Dashboard animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes highlight-pop {
+  0%   { box-shadow: 0 0 0 0 rgba(140,199,196,.6); }
+  70%  { box-shadow: 0 0 0 6px rgba(140,199,196,0); }
+  100% { box-shadow: 0 0 0 0 rgba(140,199,196,0); }
+}
+
+.animate-fade-in         { animation: fade-in .2s ease both; }
+.animate-slide-in-right  { animation: slide-in-right .2s ease both; }
+.animate-scale-in        { animation: scale-in .15s ease both; }
+.animate-highlight-pop   { animation: highlight-pop .5s ease; }
