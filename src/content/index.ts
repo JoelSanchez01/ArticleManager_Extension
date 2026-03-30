@@ -10,7 +10,7 @@ import {
 import { initTooltip, showTooltip, hideTooltip } from './tooltip'
 
 // ---------------------------------------------------------------------------
-// Bootstrap
+// Inicialización
 // ---------------------------------------------------------------------------
 initTooltip()
 setupHighlightListeners()
@@ -18,7 +18,7 @@ watchSpaNavigation()
 void repaintPageHighlights()
 
 // ---------------------------------------------------------------------------
-// Pending highlights + MutationObserver for dynamic / SPA pages
+// Subrayados pendientes + MutationObserver para páginas dinámicas / SPAs
 // ---------------------------------------------------------------------------
 let pendingHighlights: Highlight[] = []
 let pendingArticleId = ''
@@ -26,10 +26,10 @@ let paintObserver:   MutationObserver | null = null
 let observerTimeout: ReturnType<typeof setTimeout> | null = null
 
 /**
- * Starts a MutationObserver that retries painting highlights whose
- * DOM targets haven't appeared yet (e.g. lazily-rendered content).
- * Auto-stops after 30 seconds to avoid leaking observers on pages
- * that never fully render the target text.
+ * Inicia un MutationObserver que reintenta pintar los subrayados cuyos
+ * nodos del DOM aún no han aparecido (p.ej. contenido cargado de forma lazy).
+ * Se detiene automáticamente tras 30 segundos para no dejar observers
+ * activos en páginas que nunca renderizan el texto objetivo.
  */
 function startPaintObserver(): void {
   if (paintObserver) return
@@ -50,7 +50,7 @@ function startPaintObserver(): void {
   observerTimeout = setTimeout(stopPaintObserver, 30_000)
 }
 
-/** Disconnects the observer, clears its timeout, and resets the pending list. */
+/** Desconecta el observer, cancela su timeout y reinicia la lista de pendientes. */
 function stopPaintObserver(): void {
   paintObserver?.disconnect()
   paintObserver = null
@@ -62,9 +62,9 @@ function stopPaintObserver(): void {
 }
 
 /**
- * Attempts to paint any highlights that couldn't be matched on the
- * previous pass. Highlights that are still unresolved are kept in
- * the pending list for the next observer callback.
+ * Intenta pintar los subrayados que no pudieron resolverse en el paso anterior.
+ * Los que siguen sin resolver se mantienen en la lista para el próximo callback
+ * del observer.
  */
 function tryPaintPending(): void {
   const stillPending: Highlight[] = []
@@ -85,12 +85,13 @@ function tryPaintPending(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Re-paint highlights for this page on load (and on SPA navigation)
+// Re-pintado de subrayados al cargar la página (y en navegación SPA)
 // ---------------------------------------------------------------------------
+
 /**
- * Loads all highlights for the current URL from storage and paints them.
- * Highlights that can't be resolved immediately are queued for the
- * MutationObserver (handles async / lazy-loaded page content).
+ * Carga todos los subrayados de la URL actual desde el storage y los pinta.
+ * Los que no se resuelven de inmediato se encolan para el MutationObserver
+ * (gestiona contenido de página cargado de forma asíncrona / lazy).
  */
 async function repaintPageHighlights(): Promise<void> {
   stopPaintObserver()
@@ -122,12 +123,13 @@ async function repaintPageHighlights(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// SPA navigation detection (X.com, YouTube, etc.)
+// Detección de navegación SPA (X.com, YouTube, etc.)
 // ---------------------------------------------------------------------------
+
 /**
- * Intercepts history.pushState / replaceState and the popstate event
- * to detect client-side navigation on SPAs (e.g. X.com, YouTube).
- * Re-paints highlights whenever the URL changes.
+ * Intercepta history.pushState / replaceState y el evento popstate para
+ * detectar la navegación del lado del cliente en SPAs. Re-pinta los
+ * subrayados cada vez que cambia la URL.
  */
 function watchSpaNavigation(): void {
   let lastUrl = location.href
@@ -155,13 +157,14 @@ function watchSpaNavigation(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Tooltip listeners (hover / click on highlights)
+// Listeners del tooltip (hover / clic sobre subrayados)
 // ---------------------------------------------------------------------------
+
 /**
- * Attaches delegated mouseover / mouseout listeners on the document
- * to show or hide the tooltip when the user hovers over a <mark>.
- * The 200 ms hide delay prevents the tooltip from flickering when
- * the mouse briefly leaves the mark to reach the tooltip itself.
+ * Añade listeners delegados de mouseover / mouseout al documento para
+ * mostrar u ocultar el tooltip cuando el usuario pasa sobre un <mark>.
+ * El retardo de 200 ms al ocultar evita que el tooltip parpadee cuando
+ * el ratón pasa brevemente del <mark> al propio tooltip.
  */
 function setupHighlightListeners(): void {
   document.addEventListener('mouseover', (e) => {
@@ -190,9 +193,9 @@ function setupHighlightListeners(): void {
 }
 
 /**
- * Looks up the highlight data in storage and calls showTooltip.
- * Reads from storage on every hover so the tooltip always reflects
- * the latest saved note without needing a local cache.
+ * Busca el subrayado en el storage y llama a showTooltip.
+ * Lee del storage en cada hover para que el tooltip refleje siempre
+ * la nota guardada más reciente sin necesitar una caché local.
  */
 async function loadHighlightAndShow(
   highlightId: string,
@@ -214,7 +217,7 @@ async function loadHighlightAndShow(
 }
 
 // ---------------------------------------------------------------------------
-// Message listener (from Background)
+// Listener de mensajes (desde el Background)
 // ---------------------------------------------------------------------------
 chrome.runtime.onMessage.addListener(
   (
@@ -240,12 +243,13 @@ chrome.runtime.onMessage.addListener(
 )
 
 // ---------------------------------------------------------------------------
-// Selection capture and highlight save
+// Captura de selección y guardado del subrayado
 // ---------------------------------------------------------------------------
+
 /**
- * Captures the current window selection, builds a DOM anchor,
- * and sends SAVE_HIGHLIGHT to the background. On success, paints
- * the new highlight immediately so the user gets instant feedback.
+ * Captura la selección actual de la ventana, construye un anchor del DOM,
+ * y envía SAVE_HIGHLIGHT al background. Si tiene éxito, pinta el nuevo
+ * subrayado de inmediato para dar feedback instantáneo al usuario.
  */
 async function handleCaptureSelection(
   color: HighlightColor,

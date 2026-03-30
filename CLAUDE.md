@@ -123,7 +123,7 @@ La extensión tiene **tres componentes** que se comunican exclusivamente vía `c
 ### Estilo de código
 - Funciones flecha para componentes React: `const MyComponent = () => { ... }`.
 - Siempre exportar con `export` nombrado, no `export default` (excepto en entry points de React como `App.tsx`).
-- Comentarios en inglés. Nombres de variables y funciones en inglés. Textos de UI en español.
+- Comentarios en español. Nombres de variables y funciones en inglés. Textos de UI en español.
 - Máximo 80 caracteres por línea.
 - Siempre manejar el caso de error en `chrome.runtime.sendMessage` chequeando `chrome.runtime.lastError`.
 - **Nunca usar `enum`**. Siempre usar `as const` (ver sección 8).

@@ -15,9 +15,10 @@ export default function App() {
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
 
   // -------------------------------------------------------------------------
-  // Storage
+  // Almacenamiento
   // -------------------------------------------------------------------------
-  /** Reads the full storage schema and syncs it into local React state. */
+
+  /** Lee el esquema completo del storage y lo sincroniza con el estado React local. */
   const loadData = useCallback(async () => {
     const schema = await readStorage()
     setArticles(schema.articles)
@@ -32,12 +33,13 @@ export default function App() {
   }, [loadData])
 
   // -------------------------------------------------------------------------
-  // Message helper
+  // Helper de mensajes
   // -------------------------------------------------------------------------
+
   /**
-   * Promise-based wrapper for chrome.runtime.sendMessage.
-   * Resolves with a failure response instead of throwing on
-   * chrome.runtime.lastError, so callers can use async/await uniformly.
+   * Wrapper basado en promesas para chrome.runtime.sendMessage.
+   * Resuelve con una respuesta de fallo en lugar de lanzar una excepción
+   * ante chrome.runtime.lastError, para que los llamadores usen async/await uniformemente.
    */
   function sendMsg<T>(payload: Message<unknown>): Promise<MessageResponse<T>> {
     return new Promise((resolve) => {
@@ -52,7 +54,7 @@ export default function App() {
   }
 
   // -------------------------------------------------------------------------
-  // Actions
+  // Acciones
   // -------------------------------------------------------------------------
   async function handleCreateFolder(name: string, color: string) {
     await sendMsg({ type: MessageType.CREATE_FOLDER, payload: { name, color } })
@@ -101,7 +103,7 @@ export default function App() {
   }
 
   // -------------------------------------------------------------------------
-  // Derived
+  // Datos derivados
   // -------------------------------------------------------------------------
   const selectedArticle = selectedArticleId
     ? (articles[selectedArticleId] ?? null)
@@ -112,7 +114,7 @@ export default function App() {
   )
 
   // -------------------------------------------------------------------------
-  // Render
+  // Renderizado
   // -------------------------------------------------------------------------
   return (
     <div
@@ -128,7 +130,7 @@ export default function App() {
       />
 
       <div className="flex flex-col flex-1 min-w-0">
-        {/* Header */}
+        {/* Encabezado */}
         <header
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{

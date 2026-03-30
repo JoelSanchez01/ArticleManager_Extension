@@ -10,13 +10,14 @@ let shadow: ShadowRoot | null     = null
 let currentHighlightId: string | null = null
 
 // ---------------------------------------------------------------------------
-// Init
+// Inicialización
 // ---------------------------------------------------------------------------
+
 /**
- * Creates the Shadow DOM host element and injects the tooltip UI.
- * Using Shadow DOM prevents the page's own CSS from leaking into
- * the tooltip (or the tooltip's styles from breaking the page).
- * Safe to call multiple times — exits early if already initialized.
+ * Crea el elemento host del Shadow DOM e inyecta la UI del tooltip en la página.
+ * Usar Shadow DOM impide que el CSS de la página se filtre al tooltip
+ * (ni que los estilos del tooltip rompan la página).
+ * Es seguro llamarlo varias veces: sale inmediatamente si ya está inicializado.
  */
 export function initTooltip(): void {
   if (document.getElementById(TOOLTIP_HOST_ID)) return
@@ -141,12 +142,13 @@ export function initTooltip(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Events
+// Eventos
 // ---------------------------------------------------------------------------
+
 /**
- * Wires up all interactive events inside the Shadow DOM:
- * toggling edit mode, saving / cancelling a note, and deleting
- * the highlight. Also closes the tooltip on outside clicks.
+ * Conecta todos los eventos interactivos dentro del Shadow DOM:
+ * alternar el modo de edición, guardar / cancelar una nota y eliminar
+ * el subrayado. También cierra el tooltip al hacer clic fuera de él.
  */
 function setupTooltipEvents(): void {
   if (!shadow) return
@@ -189,7 +191,7 @@ function setupTooltipEvents(): void {
     }
     chrome.runtime.sendMessage(msg, (_resp: MessageResponse<unknown>) => {
       if (chrome.runtime.lastError) {
-        console.error('AM tooltip save error:', chrome.runtime.lastError)
+        console.error('AM tooltip error al guardar:', chrome.runtime.lastError)
       }
     })
   })
@@ -205,7 +207,7 @@ function setupTooltipEvents(): void {
     }
     chrome.runtime.sendMessage(msg, (_resp: MessageResponse<unknown>) => {
       if (chrome.runtime.lastError) {
-        console.error('AM tooltip delete error:', chrome.runtime.lastError)
+        console.error('AM tooltip error al eliminar:', chrome.runtime.lastError)
       }
     })
 
@@ -229,9 +231,9 @@ function setupTooltipEvents(): void {
 }
 
 /**
- * Reads the article ID from the data attribute on the active highlight's
- * <mark> element. The attribute is set by the content script when
- * highlights are painted, so it's always in sync with storage.
+ * Lee el ID del artículo desde el atributo data del elemento <mark> activo.
+ * El atributo es asignado por el content script al pintar los subrayados,
+ * por lo que siempre está sincronizado con el storage.
  */
 function getCurrentArticleId(): string | null {
   const mark = currentHighlightId
@@ -243,11 +245,12 @@ function getCurrentArticleId(): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Show / hide
+// Mostrar / ocultar
 // ---------------------------------------------------------------------------
+
 /**
- * Positions and displays the tooltip near the cursor (x, y).
- * Clamps position to keep the tooltip within the viewport.
+ * Posiciona y muestra el tooltip cerca del cursor (x, y).
+ * Ajusta la posición para mantener el tooltip dentro del viewport.
  */
 export function showTooltip(
   x: number,
@@ -278,7 +281,7 @@ export function showTooltip(
   tooltip.classList.add('visible')
 }
 
-/** Hides the tooltip and clears the active highlight reference. */
+/** Oculta el tooltip y limpia la referencia al subrayado activo. */
 export function hideTooltip(): void {
   if (!shadow) return
   shadow.getElementById('tooltip')?.classList.remove('visible')

@@ -45,7 +45,7 @@ export function FolderPanel({
         borderRight: '1px solid #1e2535',
       }}
     >
-      {/* Logo / header */}
+      {/* Encabezado */}
       <div className="px-4 pt-5 pb-3">
         <p
           className="text-[10px] font-semibold uppercase tracking-[0.12em]"
@@ -56,7 +56,7 @@ export function FolderPanel({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5">
-        {/* All articles */}
+        {/* Todos los artículos */}
         <FolderItem
           label="📚 Todos los artículos"
           color="#8CC7C4"
@@ -100,10 +100,10 @@ export function FolderPanel({
         ))}
       </nav>
 
-      {/* Divider */}
+      {/* Separador */}
       <div style={{ height: '1px', background: '#1e2535', margin: '0 16px' }} />
 
-      {/* New folder */}
+      {/* Nueva carpeta */}
       <div className="p-3">
         {creating ? (
           <div className="animate-fade-in space-y-2">
@@ -134,7 +134,7 @@ export function FolderPanel({
                 if (e.key === 'Escape') setCreating(false)
               }}
             />
-            {/* Color swatches */}
+            {/* Selector de color */}
             <div className="flex gap-1.5 justify-center">
               {FOLDER_COLORS.map((c) => (
                 <button
@@ -201,7 +201,7 @@ export function FolderPanel({
         )}
       </div>
 
-      {/* Delete confirmation modal */}
+      {/* Modal de confirmación de eliminación */}
       {confirmDelete && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50
@@ -268,7 +268,7 @@ export function FolderPanel({
 }
 
 // ---------------------------------------------------------------------------
-// Sub-component
+// Sub-componente
 // ---------------------------------------------------------------------------
 interface FolderItemProps {
   label: string

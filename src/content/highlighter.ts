@@ -15,13 +15,14 @@ const COLOR_MAP: Record<HighlightColor, string> = {
 }
 
 // ---------------------------------------------------------------------------
-// Anchor building
+// Construcción del anchor
 // ---------------------------------------------------------------------------
+
 /**
- * Builds a serializable location anchor from a live DOM Range.
- * Prefers the text-context strategy (prefix + exact + suffix) because
- * it survives minor DOM mutations. Falls back to XPath only when the
- * selection spans multiple sibling containers.
+ * Construye un anchor de localización serializable desde un Range del DOM.
+ * Prefiere la estrategia text-context (prefijo + exacto + sufijo) porque
+ * sobrevive a mutaciones menores del DOM. Solo usa XPath como fallback cuando
+ * la selección abarca varios contenedores hermanos.
  */
 export function buildAnchor(range: Range): {
   anchorStrategy: 'text-context' | 'xpath'
@@ -29,15 +30,15 @@ export function buildAnchor(range: Range): {
 } {
   const exact = range.toString()
   if (!exact.trim()) {
-    throw new Error('Empty selection')
+    throw new Error('Selección vacía')
   }
 
-  // Try text-context anchor first (more robust for re-paint)
+  // Intenta primero el anchor text-context (más robusto para re-pintado)
   try {
     const anchor = buildTextContextAnchor(range, exact)
     return { anchorStrategy: 'text-context', anchor }
   } catch {
-    // Fall back to xpath
+    // Fallback a XPath si el contexto de texto no es suficiente
     const anchor = buildXPathAnchor(range)
     return { anchorStrategy: 'xpath', anchor }
   }
@@ -80,11 +81,11 @@ function getXPath(node: Node): string {
   const parts: string[] = []
   let current: Node | null = node
 
-  // Walk to the nearest element if we start on a text node
+  // Si el nodo inicial es un texto, sube al elemento padre
   if (current.nodeType === Node.TEXT_NODE) {
     const parent = current.parentNode
     if (!parent) return ''
-    // Index among text-node siblings
+    // Índice entre los nodos de texto hermanos
     const textNodes = Array.from(parent.childNodes).filter(
       (n) => n.nodeType === Node.TEXT_NODE,
     )
@@ -110,12 +111,13 @@ function getXPath(node: Node): string {
 }
 
 // ---------------------------------------------------------------------------
-// Finding a range from an anchor
+// Búsqueda del rango desde un anchor
 // ---------------------------------------------------------------------------
+
 /**
- * Resolves a stored anchor back to a live DOM Range.
- * Returns null if the target text is no longer present in the page
- * (e.g. the article was updated or the DOM hasn't loaded yet).
+ * Resuelve un anchor almacenado de vuelta a un Range del DOM activo.
+ * Devuelve null si el texto objetivo ya no existe en la página
+ * (por ejemplo, el artículo fue actualizado o el DOM aún no ha cargado).
  */
 export function findRange(highlight: Highlight): Range | null {
   if (highlight.anchorStrategy === 'text-context') {
@@ -125,14 +127,14 @@ export function findRange(highlight: Highlight): Range | null {
 }
 
 /**
- * Locates the anchor by flattening all page text nodes into a single
- * string, finding the prefix+exact+suffix sequence, and mapping the
- * character offset back to the corresponding DOM node + offset.
- * Falls back to searching for the exact text alone if full context
- * is not found (handles minor surrounding edits).
+ * Localiza el anchor aplanando todos los nodos de texto de la página en una
+ * sola cadena, buscando la secuencia prefijo+exacto+sufijo, y mapeando el
+ * offset de carácter de vuelta al nodo DOM correspondiente.
+ * Si no encuentra el contexto completo, intenta solo con el texto exacto
+ * (tolera ediciones menores en el contexto circundante).
  */
 function findRangeByTextContext(anchor: TextContextAnchor): Range | null {
-  // Build a flat list of text nodes and their document-relative positions
+  // Construye una lista plana de nodos de texto con sus posiciones relativas al documento
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   const nodes: Array<{ node: Text; start: number }> = []
   let offset = 0
@@ -144,14 +146,14 @@ function findRangeByTextContext(anchor: TextContextAnchor): Range | null {
     offset += t.length
   }
 
-  // Rebuild the full text so we can locate the anchor
+  // Reconstruye el texto completo para localizar el anchor
   const fullText = nodes.map((n) => n.node.textContent ?? '').join('')
 
   const search = anchor.prefix + anchor.exact + anchor.suffix
   let pos = fullText.indexOf(search)
 
   if (pos === -1) {
-    // Try without context
+    // Intenta sin el contexto si la búsqueda completa falla
     pos = fullText.indexOf(anchor.exact)
     if (pos === -1) return null
   } else {
@@ -160,7 +162,7 @@ function findRangeByTextContext(anchor: TextContextAnchor): Range | null {
 
   const exactEnd = pos + anchor.exact.length
 
-  // Map document-flat position to DOM node + offset
+  // Mapea la posición plana del documento al nodo DOM + offset
   const startInfo = mapPosition(nodes, pos)
   const endInfo   = mapPosition(nodes, exactEnd)
   if (!startInfo || !endInfo) return null
@@ -208,14 +210,14 @@ function findRangeByXPath(anchor: XPathAnchor): Range | null {
 }
 
 // ---------------------------------------------------------------------------
-// Painting
+// Pintado
 // ---------------------------------------------------------------------------
+
 /**
- * Wraps the highlight's text in colored <mark> elements.
- * No-op if the highlight is already painted (idempotent).
+ * Envuelve el texto del subrayado en elementos <mark> con el color indicado.
+ * No hace nada si el subrayado ya está pintado (idempotente).
  */
 export function paintHighlight(highlight: Highlight): void {
-  // Avoid double-painting
   if (document.querySelector(`[data-am-id="${highlight.id}"]`)) return
 
   const range = findRange(highlight)
@@ -224,7 +226,7 @@ export function paintHighlight(highlight: Highlight): void {
   applyMarkToRange(range, highlight.id, highlight.color)
 }
 
-// Collect all Text nodes that are (at least partially) inside the range.
+/** Recopila todos los nodos Text que estén (al menos parcialmente) dentro del range. */
 function getTextNodesInRange(range: Range): Text[] {
   const root = range.commonAncestorContainer
   if (root.nodeType === Node.TEXT_NODE) return [root as Text]
@@ -243,8 +245,8 @@ function makeMark(highlightId: string, color: HighlightColor): HTMLElement {
   mark.dataset['amId'] = highlightId
   mark.className       = HIGHLIGHT_CLASS
 
-  // !important overrides page CSS rules like `* { color: white !important }`
-  // or `mark { background: transparent }`.
+  // !important sobreescribe reglas CSS de la página como `* { color: white !important }`
+  // o `mark { background: transparent }`.
   const bg = COLOR_MAP[color]
   mark.style.setProperty('background-color', bg,         'important')
   mark.style.setProperty('color',            '#111827',   'important')
@@ -257,13 +259,15 @@ function makeMark(highlightId: string, color: HighlightColor): HTMLElement {
   return mark
 }
 
+/**
+ * Envuelve cada nodo de texto individualmente para no intentar rodear un range
+ * que cruce límites de elementos (lo que corrompería el DOM).
+ */
 function applyMarkToRange(
   range: Range,
   highlightId: string,
   color: HighlightColor,
 ): void {
-  // Wrap each text node individually so we never try to surround a range
-  // that crosses element boundaries (which corrupts the DOM).
   const textNodes = getTextNodesInRange(range)
   for (const node of textNodes) {
     const nodeRange = document.createRange()
@@ -281,14 +285,14 @@ function applyMarkToRange(
       nodeRange.selectNode(node)
     }
 
-    // Skip empty sub-ranges (e.g. collapsed whitespace)
+    // Omite sub-ranges vacíos (p.ej. espacios en blanco colapsados)
     if (nodeRange.collapsed) continue
 
     const mark = makeMark(highlightId, color)
     try {
       nodeRange.surroundContents(mark)
     } catch {
-      // Last-resort fallback; should rarely trigger now.
+      // Fallback de último recurso; raramente debería activarse.
       const fragment = nodeRange.extractContents()
       mark.appendChild(fragment)
       nodeRange.insertNode(mark)
@@ -297,12 +301,11 @@ function applyMarkToRange(
 }
 
 /**
- * Removes all <mark> elements for a highlight ID and restores
- * the original text nodes in place.
+ * Elimina todos los elementos <mark> de un subrayado y restaura
+ * los nodos de texto originales en su lugar.
  */
 export function removePaintedHighlight(highlightId: string): void {
-  // A highlight may span multiple <mark> elements (one per text node),
-  // so remove all of them.
+  // Un subrayado puede abarcar varios <mark> (uno por nodo de texto)
   const els = document.querySelectorAll(`[data-am-id="${highlightId}"]`)
   for (const el of els) {
     const parent = el.parentNode
@@ -312,7 +315,7 @@ export function removePaintedHighlight(highlightId: string): void {
   }
 }
 
-/** Paints a batch of highlights in order. Skips already-painted ones. */
+/** Pinta un lote de subrayados en orden. Omite los ya pintados. */
 export function repaintHighlights(highlights: Highlight[]): void {
   for (const h of highlights) {
     paintHighlight(h)

@@ -12,9 +12,10 @@ export const DEFAULT_SCHEMA: IStorageSchema = {
 }
 
 /**
- * Reads the full storage schema from chrome.storage.local.
- * Falls back to empty defaults for any missing key, so callers
- * always receive a fully-typed object without extra null-checks.
+ * Lee el esquema completo desde chrome.storage.local.
+ * Aplica valores por defecto para cualquier clave ausente, de modo
+ * que los llamadores siempre reciban un objeto completamente tipado
+ * sin necesidad de comprobaciones extra de nulos.
  */
 export async function readStorage(): Promise<IStorageSchema> {
   const data = await chrome.storage.local.get(null) as Record<string, unknown>

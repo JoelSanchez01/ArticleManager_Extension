@@ -14,7 +14,7 @@ import type {
 import { DEFAULT_SCHEMA, readStorage } from '../shared/storage'
 
 // ---------------------------------------------------------------------------
-// Context menu IDs
+// IDs del menú contextual
 // ---------------------------------------------------------------------------
 const MENU = {
   PARENT:           'am-parent',
@@ -25,7 +25,7 @@ const MENU = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Initialization
+// Inicialización
 // ---------------------------------------------------------------------------
 chrome.runtime.onInstalled.addListener(async () => {
   const existing = await chrome.storage.local.get(null) as Record<
@@ -70,14 +70,14 @@ chrome.runtime.onInstalled.addListener(async () => {
 })
 
 // ---------------------------------------------------------------------------
-// Icon click → open dashboard
+// Clic en el ícono → abrir dashboard
 // ---------------------------------------------------------------------------
 chrome.action.onClicked.addListener(() => {
   void chrome.tabs.create({ url: chrome.runtime.getURL('dashboard.html') })
 })
 
 // ---------------------------------------------------------------------------
-// Context menu handler
+// Manejador del menú contextual
 // ---------------------------------------------------------------------------
 chrome.contextMenus.onClicked.addListener(
   (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
@@ -102,7 +102,7 @@ chrome.contextMenus.onClicked.addListener(
 )
 
 // ---------------------------------------------------------------------------
-// Message handler
+// Manejador de mensajes
 // ---------------------------------------------------------------------------
 chrome.runtime.onMessage.addListener(
   (
@@ -124,7 +124,7 @@ chrome.runtime.onMessage.addListener(
 )
 
 // ---------------------------------------------------------------------------
-// Message routing
+// Enrutamiento de mensajes
 // ---------------------------------------------------------------------------
 async function handleMessage(
   message: Message<unknown>,
@@ -201,22 +201,23 @@ async function handleMessage(
       )
 
     default:
-      return { success: false, error: `Unknown message type: ${message.type}` }
+      return { success: false, error: `Tipo de mensaje desconocido: ${message.type}` }
   }
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Utilidades
 // ---------------------------------------------------------------------------
-/** Generates a collision-resistant ID: timestamp + 7-char base-36 random suffix. */
+
+/** Genera un ID resistente a colisiones: timestamp + sufijo aleatorio en base-36. */
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
 /**
- * Atomic read-modify-write helper for chrome.storage.local.
- * Always reads the latest persisted state before applying the
- * updater, preventing stale-read overwrites on concurrent calls.
+ * Helper de lectura-modificación-escritura atómico para chrome.storage.local.
+ * Siempre lee el estado más reciente antes de aplicar el updater, evitando
+ * sobreescrituras por lecturas desactualizadas en llamadas concurrentes.
  */
 async function writeStorage(
   updater: (schema: IStorageSchema) => IStorageSchema,
@@ -231,11 +232,12 @@ async function writeStorage(
 }
 
 // ---------------------------------------------------------------------------
-// Handlers
+// Manejadores
 // ---------------------------------------------------------------------------
+
 /**
- * Saves a new article, or returns the existing one if the URL is
- * already stored (idempotent by URL).
+ * Guarda un artículo nuevo, o devuelve el existente si la URL ya
+ * está almacenada (idempotente por URL).
  */
 async function handleSaveArticle(payload: {
   url: string
@@ -266,8 +268,8 @@ async function handleSaveArticle(payload: {
 }
 
 /**
- * Saves a highlight, auto-creating its parent article first if
- * the URL hasn't been stored yet.
+ * Guarda un subrayado, creando primero el artículo padre si la URL
+ * aún no está almacenada.
  */
 async function handleSaveHighlight(payload: {
   url: string
@@ -290,7 +292,7 @@ async function handleSaveHighlight(payload: {
       domain: payload.domain,
     })
     if (!saveResult.success || !saveResult.data) {
-      return { success: false, error: 'Failed to create article' }
+      return { success: false, error: 'No se pudo crear el artículo' }
     }
     article = saveResult.data
   }
@@ -323,7 +325,7 @@ async function handleSaveHighlight(payload: {
   return { success: true, data: highlight }
 }
 
-/** Updates the note text attached to a specific highlight. */
+/** Actualiza el texto de la nota asociada a un subrayado específico. */
 async function handleUpdateHighlightNote(payload: {
   highlightId: string
   articleId: string
@@ -344,11 +346,11 @@ async function handleUpdateHighlightNote(payload: {
       articles: { ...s.articles, [art.id]: { ...art, highlights } },
     }
   })
-  if (!updated) return { success: false, error: 'Highlight not found' }
+  if (!updated) return { success: false, error: 'Subrayado no encontrado' }
   return { success: true, data: updated }
 }
 
-/** Removes a highlight from its article. */
+/** Elimina un subrayado de su artículo. */
 async function handleDeleteHighlight(payload: {
   highlightId: string
   articleId: string
@@ -372,7 +374,7 @@ async function handleDeleteHighlight(payload: {
   return { success: true, data: null }
 }
 
-/** Creates a new folder with the given name and accent color. */
+/** Crea una carpeta nueva con el nombre y color de acento indicados. */
 async function handleCreateFolder(payload: {
   name: string
   color: string
@@ -391,8 +393,8 @@ async function handleCreateFolder(payload: {
 }
 
 /**
- * Deletes a folder and unassigns all its articles
- * (articles are kept, just moved to "no folder").
+ * Elimina una carpeta y desasigna todos sus artículos
+ * (los artículos se conservan, simplemente pasan a "sin carpeta").
  */
 async function handleDeleteFolder(payload: {
   folderId: string
@@ -412,7 +414,7 @@ async function handleDeleteFolder(payload: {
   return { success: true, data: null }
 }
 
-/** Moves an article to a folder, or removes it from any folder (folderId = null). */
+/** Mueve un artículo a una carpeta, o lo saca de cualquier carpeta (folderId = null). */
 async function handleMoveArticle(payload: {
   articleId: string
   folderId: string | null
@@ -431,7 +433,7 @@ async function handleMoveArticle(payload: {
   return { success: true, data: null }
 }
 
-/** Updates the read status (unread → reading → read) of an article. */
+/** Actualiza el estado de lectura (sin leer → leyendo → leído) de un artículo. */
 async function handleUpdateArticleStatus(payload: {
   articleId: string
   status: ReadStatus
@@ -450,7 +452,7 @@ async function handleUpdateArticleStatus(payload: {
   return { success: true, data: null }
 }
 
-/** Permanently removes an article and all its highlights. */
+/** Elimina permanentemente un artículo y todos sus subrayados. */
 async function handleDeleteArticle(payload: {
   articleId: string
 }): Promise<MessageResponse<null>> {

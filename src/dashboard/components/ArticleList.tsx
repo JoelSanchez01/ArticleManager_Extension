@@ -91,7 +91,7 @@ export function ArticleList({
       className="flex flex-col flex-1 min-w-0 min-h-0"
       style={{ background: '#0f1117' }}
     >
-      {/* Filter bar */}
+      {/* Barra de filtros */}
       <div
         className="flex items-center gap-2 px-5 py-3 flex-shrink-0"
         style={{ borderBottom: '1px solid #1e2535' }}
@@ -126,7 +126,7 @@ export function ArticleList({
         </span>
       </div>
 
-      {/* List */}
+      {/* Lista */}
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3">
@@ -174,7 +174,7 @@ export function ArticleList({
                   }
                 >
                   <div className="px-5 py-3.5 flex items-start gap-3">
-                    {/* Status dot */}
+                    {/* Indicador de estado */}
                     <button
                       className="mt-0.5 flex-shrink-0 text-lg leading-none
                                  transition-transform duration-150 hover:scale-125"
@@ -191,7 +191,7 @@ export function ArticleList({
                       {STATUS_DOTS[article.status]}
                     </button>
 
-                    {/* Text info */}
+                    {/* Información del artículo */}
                     <div className="flex-1 min-w-0">
                       <p
                         className="text-sm font-medium truncate"
@@ -234,14 +234,14 @@ export function ArticleList({
                       </div>
                     </div>
 
-                    {/* Action buttons (shown on hover or selected) */}
+                    {/* Botones de acción (visibles al hover o selección) */}
                     {(isHovered || isSelected) && (
                       <div
                         className="flex items-center gap-1 flex-shrink-0
                                    animate-fade-in"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {/* Move to folder */}
+                        {/* Mover a carpeta */}
                         <div className="relative">
                           <ActionBtn
                             label="📁"
@@ -284,7 +284,7 @@ export function ArticleList({
                           )}
                         </div>
 
-                        {/* Open URL */}
+                        {/* Abrir URL */}
                         <a
                           href={article.url}
                           target="_blank"
@@ -309,7 +309,7 @@ export function ArticleList({
                           ↗
                         </a>
 
-                        {/* Delete */}
+                        {/* Eliminar */}
                         <ActionBtn
                           label="✕"
                           title="Eliminar"
@@ -326,7 +326,7 @@ export function ArticleList({
         )}
       </div>
 
-      {/* Delete confirmation */}
+      {/* Confirmación de eliminación */}
       {confirmDeleteId && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50
@@ -394,7 +394,7 @@ export function ArticleList({
 }
 
 // ---------------------------------------------------------------------------
-// Sub-components
+// Sub-componentes
 // ---------------------------------------------------------------------------
 interface ActionBtnProps {
   label: string

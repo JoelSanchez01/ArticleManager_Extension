@@ -60,7 +60,7 @@ export function NoteViewer({
         borderLeft: '1px solid #1e2535',
       }}
     >
-      {/* Header */}
+      {/* Encabezado */}
       <div
         className="px-4 py-4 flex-shrink-0"
         style={{ borderBottom: '1px solid #1e2535' }}
@@ -100,7 +100,7 @@ export function NoteViewer({
           </button>
         </div>
 
-        {/* Stats */}
+        {/* Estadísticas */}
         <div className="flex gap-3 mt-3">
           <Stat
             value={article.highlights.length}
@@ -117,7 +117,7 @@ export function NoteViewer({
         </div>
       </div>
 
-      {/* Highlights list */}
+      {/* Lista de subrayados */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {sortedHighlights.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2">
@@ -146,7 +146,7 @@ export function NoteViewer({
         )}
       </div>
 
-      {/* Footer */}
+      {/* Pie de página */}
       <div
         className="px-4 py-3 flex-shrink-0 flex items-center justify-between"
         style={{ borderTop: '1px solid #1e2535' }}
@@ -175,7 +175,7 @@ export function NoteViewer({
 }
 
 // ---------------------------------------------------------------------------
-// Sub-components
+// Sub-componentes
 // ---------------------------------------------------------------------------
 function Stat({
   value,
@@ -236,7 +236,7 @@ function HighlightCard({
         border: '1px solid #1e2535',
       }}
     >
-      {/* Quoted text */}
+      {/* Texto citado */}
       <blockquote
         className="rounded-lg px-3 py-2.5 text-sm leading-relaxed relative"
         style={{
@@ -253,7 +253,7 @@ function HighlightCard({
         {formatDate(highlight.createdAt)}
       </p>
 
-      {/* Note section */}
+      {/* Sección de nota */}
       <div>
         <div className="flex items-center gap-1 mb-1.5">
           <span
@@ -340,7 +340,7 @@ function HighlightCard({
         )}
       </div>
 
-      {/* Delete */}
+      {/* Eliminar */}
       <div className="flex justify-end pt-0.5">
         {confirmDel ? (
           <div className="flex items-center gap-2 text-xs">
