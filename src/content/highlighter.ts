@@ -17,6 +17,12 @@ const COLOR_MAP: Record<HighlightColor, string> = {
 // ---------------------------------------------------------------------------
 // Anchor building
 // ---------------------------------------------------------------------------
+/**
+ * Builds a serializable location anchor from a live DOM Range.
+ * Prefers the text-context strategy (prefix + exact + suffix) because
+ * it survives minor DOM mutations. Falls back to XPath only when the
+ * selection spans multiple sibling containers.
+ */
 export function buildAnchor(range: Range): {
   anchorStrategy: 'text-context' | 'xpath'
   anchor: TextContextAnchor | XPathAnchor
@@ -106,6 +112,11 @@ function getXPath(node: Node): string {
 // ---------------------------------------------------------------------------
 // Finding a range from an anchor
 // ---------------------------------------------------------------------------
+/**
+ * Resolves a stored anchor back to a live DOM Range.
+ * Returns null if the target text is no longer present in the page
+ * (e.g. the article was updated or the DOM hasn't loaded yet).
+ */
 export function findRange(highlight: Highlight): Range | null {
   if (highlight.anchorStrategy === 'text-context') {
     return findRangeByTextContext(highlight.anchor as TextContextAnchor)
@@ -113,6 +124,13 @@ export function findRange(highlight: Highlight): Range | null {
   return findRangeByXPath(highlight.anchor as XPathAnchor)
 }
 
+/**
+ * Locates the anchor by flattening all page text nodes into a single
+ * string, finding the prefix+exact+suffix sequence, and mapping the
+ * character offset back to the corresponding DOM node + offset.
+ * Falls back to searching for the exact text alone if full context
+ * is not found (handles minor surrounding edits).
+ */
 function findRangeByTextContext(anchor: TextContextAnchor): Range | null {
   // Build a flat list of text nodes and their document-relative positions
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
@@ -192,6 +210,10 @@ function findRangeByXPath(anchor: XPathAnchor): Range | null {
 // ---------------------------------------------------------------------------
 // Painting
 // ---------------------------------------------------------------------------
+/**
+ * Wraps the highlight's text in colored <mark> elements.
+ * No-op if the highlight is already painted (idempotent).
+ */
 export function paintHighlight(highlight: Highlight): void {
   // Avoid double-painting
   if (document.querySelector(`[data-am-id="${highlight.id}"]`)) return
@@ -274,6 +296,10 @@ function applyMarkToRange(
   }
 }
 
+/**
+ * Removes all <mark> elements for a highlight ID and restores
+ * the original text nodes in place.
+ */
 export function removePaintedHighlight(highlightId: string): void {
   // A highlight may span multiple <mark> elements (one per text node),
   // so remove all of them.
@@ -286,6 +312,7 @@ export function removePaintedHighlight(highlightId: string): void {
   }
 }
 
+/** Paints a batch of highlights in order. Skips already-painted ones. */
 export function repaintHighlights(highlights: Highlight[]): void {
   for (const h of highlights) {
     paintHighlight(h)

@@ -17,6 +17,7 @@ export default function App() {
   // -------------------------------------------------------------------------
   // Storage
   // -------------------------------------------------------------------------
+  /** Reads the full storage schema and syncs it into local React state. */
   const loadData = useCallback(async () => {
     const schema = await readStorage()
     setArticles(schema.articles)
@@ -33,6 +34,11 @@ export default function App() {
   // -------------------------------------------------------------------------
   // Message helper
   // -------------------------------------------------------------------------
+  /**
+   * Promise-based wrapper for chrome.runtime.sendMessage.
+   * Resolves with a failure response instead of throwing on
+   * chrome.runtime.lastError, so callers can use async/await uniformly.
+   */
   function sendMsg<T>(payload: Message<unknown>): Promise<MessageResponse<T>> {
     return new Promise((resolve) => {
       chrome.runtime.sendMessage(payload, (resp: MessageResponse<T>) => {

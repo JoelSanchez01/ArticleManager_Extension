@@ -25,6 +25,12 @@ let pendingArticleId = ''
 let paintObserver:   MutationObserver | null = null
 let observerTimeout: ReturnType<typeof setTimeout> | null = null
 
+/**
+ * Starts a MutationObserver that retries painting highlights whose
+ * DOM targets haven't appeared yet (e.g. lazily-rendered content).
+ * Auto-stops after 30 seconds to avoid leaking observers on pages
+ * that never fully render the target text.
+ */
 function startPaintObserver(): void {
   if (paintObserver) return
 
@@ -44,6 +50,7 @@ function startPaintObserver(): void {
   observerTimeout = setTimeout(stopPaintObserver, 30_000)
 }
 
+/** Disconnects the observer, clears its timeout, and resets the pending list. */
 function stopPaintObserver(): void {
   paintObserver?.disconnect()
   paintObserver = null
@@ -54,6 +61,11 @@ function stopPaintObserver(): void {
   pendingHighlights = []
 }
 
+/**
+ * Attempts to paint any highlights that couldn't be matched on the
+ * previous pass. Highlights that are still unresolved are kept in
+ * the pending list for the next observer callback.
+ */
 function tryPaintPending(): void {
   const stillPending: Highlight[] = []
   for (const h of pendingHighlights) {
@@ -75,6 +87,11 @@ function tryPaintPending(): void {
 // ---------------------------------------------------------------------------
 // Re-paint highlights for this page on load (and on SPA navigation)
 // ---------------------------------------------------------------------------
+/**
+ * Loads all highlights for the current URL from storage and paints them.
+ * Highlights that can't be resolved immediately are queued for the
+ * MutationObserver (handles async / lazy-loaded page content).
+ */
 async function repaintPageHighlights(): Promise<void> {
   stopPaintObserver()
 
@@ -107,6 +124,11 @@ async function repaintPageHighlights(): Promise<void> {
 // ---------------------------------------------------------------------------
 // SPA navigation detection (X.com, YouTube, etc.)
 // ---------------------------------------------------------------------------
+/**
+ * Intercepts history.pushState / replaceState and the popstate event
+ * to detect client-side navigation on SPAs (e.g. X.com, YouTube).
+ * Re-paints highlights whenever the URL changes.
+ */
 function watchSpaNavigation(): void {
   let lastUrl = location.href
 
@@ -135,6 +157,12 @@ function watchSpaNavigation(): void {
 // ---------------------------------------------------------------------------
 // Tooltip listeners (hover / click on highlights)
 // ---------------------------------------------------------------------------
+/**
+ * Attaches delegated mouseover / mouseout listeners on the document
+ * to show or hide the tooltip when the user hovers over a <mark>.
+ * The 200 ms hide delay prevents the tooltip from flickering when
+ * the mouse briefly leaves the mark to reach the tooltip itself.
+ */
 function setupHighlightListeners(): void {
   document.addEventListener('mouseover', (e) => {
     const mark = (e.target as HTMLElement).closest?.(
@@ -161,6 +189,11 @@ function setupHighlightListeners(): void {
   })
 }
 
+/**
+ * Looks up the highlight data in storage and calls showTooltip.
+ * Reads from storage on every hover so the tooltip always reflects
+ * the latest saved note without needing a local cache.
+ */
 async function loadHighlightAndShow(
   highlightId: string,
   x: number,
@@ -209,6 +242,11 @@ chrome.runtime.onMessage.addListener(
 // ---------------------------------------------------------------------------
 // Selection capture and highlight save
 // ---------------------------------------------------------------------------
+/**
+ * Captures the current window selection, builds a DOM anchor,
+ * and sends SAVE_HIGHLIGHT to the background. On success, paints
+ * the new highlight immediately so the user gets instant feedback.
+ */
 async function handleCaptureSelection(
   color: HighlightColor,
 ): Promise<MessageResponse<unknown>> {

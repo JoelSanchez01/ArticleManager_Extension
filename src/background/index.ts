@@ -208,10 +208,16 @@ async function handleMessage(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+/** Generates a collision-resistant ID: timestamp + 7-char base-36 random suffix. */
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
+/**
+ * Atomic read-modify-write helper for chrome.storage.local.
+ * Always reads the latest persisted state before applying the
+ * updater, preventing stale-read overwrites on concurrent calls.
+ */
 async function writeStorage(
   updater: (schema: IStorageSchema) => IStorageSchema,
 ): Promise<void> {
@@ -227,6 +233,10 @@ async function writeStorage(
 // ---------------------------------------------------------------------------
 // Handlers
 // ---------------------------------------------------------------------------
+/**
+ * Saves a new article, or returns the existing one if the URL is
+ * already stored (idempotent by URL).
+ */
 async function handleSaveArticle(payload: {
   url: string
   title: string
@@ -255,6 +265,10 @@ async function handleSaveArticle(payload: {
   return { success: true, data: article }
 }
 
+/**
+ * Saves a highlight, auto-creating its parent article first if
+ * the URL hasn't been stored yet.
+ */
 async function handleSaveHighlight(payload: {
   url: string
   title: string
@@ -309,6 +323,7 @@ async function handleSaveHighlight(payload: {
   return { success: true, data: highlight }
 }
 
+/** Updates the note text attached to a specific highlight. */
 async function handleUpdateHighlightNote(payload: {
   highlightId: string
   articleId: string
@@ -333,6 +348,7 @@ async function handleUpdateHighlightNote(payload: {
   return { success: true, data: updated }
 }
 
+/** Removes a highlight from its article. */
 async function handleDeleteHighlight(payload: {
   highlightId: string
   articleId: string
@@ -356,6 +372,7 @@ async function handleDeleteHighlight(payload: {
   return { success: true, data: null }
 }
 
+/** Creates a new folder with the given name and accent color. */
 async function handleCreateFolder(payload: {
   name: string
   color: string
@@ -373,6 +390,10 @@ async function handleCreateFolder(payload: {
   return { success: true, data: folder }
 }
 
+/**
+ * Deletes a folder and unassigns all its articles
+ * (articles are kept, just moved to "no folder").
+ */
 async function handleDeleteFolder(payload: {
   folderId: string
 }): Promise<MessageResponse<null>> {
@@ -391,6 +412,7 @@ async function handleDeleteFolder(payload: {
   return { success: true, data: null }
 }
 
+/** Moves an article to a folder, or removes it from any folder (folderId = null). */
 async function handleMoveArticle(payload: {
   articleId: string
   folderId: string | null
@@ -409,6 +431,7 @@ async function handleMoveArticle(payload: {
   return { success: true, data: null }
 }
 
+/** Updates the read status (unread → reading → read) of an article. */
 async function handleUpdateArticleStatus(payload: {
   articleId: string
   status: ReadStatus
@@ -427,6 +450,7 @@ async function handleUpdateArticleStatus(payload: {
   return { success: true, data: null }
 }
 
+/** Permanently removes an article and all its highlights. */
 async function handleDeleteArticle(payload: {
   articleId: string
 }): Promise<MessageResponse<null>> {

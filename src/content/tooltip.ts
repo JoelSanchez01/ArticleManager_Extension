@@ -12,6 +12,12 @@ let currentHighlightId: string | null = null
 // ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
+/**
+ * Creates the Shadow DOM host element and injects the tooltip UI.
+ * Using Shadow DOM prevents the page's own CSS from leaking into
+ * the tooltip (or the tooltip's styles from breaking the page).
+ * Safe to call multiple times — exits early if already initialized.
+ */
 export function initTooltip(): void {
   if (document.getElementById(TOOLTIP_HOST_ID)) return
 
@@ -137,6 +143,11 @@ export function initTooltip(): void {
 // ---------------------------------------------------------------------------
 // Events
 // ---------------------------------------------------------------------------
+/**
+ * Wires up all interactive events inside the Shadow DOM:
+ * toggling edit mode, saving / cancelling a note, and deleting
+ * the highlight. Also closes the tooltip on outside clicks.
+ */
 function setupTooltipEvents(): void {
   if (!shadow) return
 
@@ -217,6 +228,11 @@ function setupTooltipEvents(): void {
   })
 }
 
+/**
+ * Reads the article ID from the data attribute on the active highlight's
+ * <mark> element. The attribute is set by the content script when
+ * highlights are painted, so it's always in sync with storage.
+ */
 function getCurrentArticleId(): string | null {
   const mark = currentHighlightId
     ? (document.querySelector(`[data-am-id="${currentHighlightId}"]`) as
@@ -229,6 +245,10 @@ function getCurrentArticleId(): string | null {
 // ---------------------------------------------------------------------------
 // Show / hide
 // ---------------------------------------------------------------------------
+/**
+ * Positions and displays the tooltip near the cursor (x, y).
+ * Clamps position to keep the tooltip within the viewport.
+ */
 export function showTooltip(
   x: number,
   y: number,
@@ -258,6 +278,7 @@ export function showTooltip(
   tooltip.classList.add('visible')
 }
 
+/** Hides the tooltip and clears the active highlight reference. */
 export function hideTooltip(): void {
   if (!shadow) return
   shadow.getElementById('tooltip')?.classList.remove('visible')
