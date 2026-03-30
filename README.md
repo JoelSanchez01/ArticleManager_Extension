@@ -10,7 +10,6 @@ Una extensión de Chrome para **gestionar, catalogar y analizar artículos web, 
 - **Subrayado persistente** — Selecciona texto, elige un color y el subrayado persiste entre visitas.
 - **Notas in-situ** — Adjunta notas a cada subrayado directamente sobre la página, sin salir de ella.
 - **Dashboard completo** — Vista a pantalla completa para catalogar artículos por estado (sin leer, leyendo, leído) y carpetas personalizadas.
-- **Integración con Gemini AI** — Analiza texto seleccionado con Google Gemini y guarda el resultado junto al subrayado.
 
 ---
 
@@ -23,7 +22,6 @@ Una extensión de Chrome para **gestionar, catalogar y analizar artículos web, 
 | Build tool | Vite + `@crxjs/vite-plugin` |
 | Estilos | Tailwind CSS v3 |
 | Almacenamiento | Chrome Storage API |
-| IA | Google Gemini API |
 
 ---
 
@@ -89,11 +87,6 @@ npm run build
 3. Activa el **Modo desarrollador**.
 4. Haz clic en **Cargar descomprimida** y selecciona la carpeta `dist/`.
 
-### Configurar Gemini AI (opcional)
-
-1. Abre el Dashboard desde el ícono de la extensión.
-2. Ve a **Configuración** e introduce tu API key de Google Gemini.
-
 ---
 
 ## Estado del Proyecto
@@ -101,10 +94,9 @@ npm run build
 | Fase | Descripción | Estado |
 |---|---|---|
 | Fase 0 | Scaffolding, tipos y configuración base | ✅ Completada |
-| Fase 1 | Subrayado persistente y storage | 🔄 En progreso |
-| Fase 2 | Dashboard base | ⏳ Pendiente |
-| Fase 3 | Notas in-situ | ⏳ Pendiente |
-| Fase 4 | Integración Gemini AI | ⏳ Pendiente |
+| Fase 1 | Subrayado persistente y storage | ✅ Completada |
+| Fase 2 | Dashboard base | ✅ Completada |
+| Fase 3 | Notas in-situ | ✅ Completada |
 
 ---
 
